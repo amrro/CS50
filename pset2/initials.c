@@ -13,7 +13,7 @@ int main(void)
         if ( name[i] == ' ')
             printf("%c", toupper(name[i + 1]));
         else if (i == 0)
-            printf("%c", name[i]);
+            printf("%c", toupper(name[i]));
 
     printf("\n");
     return 0;
