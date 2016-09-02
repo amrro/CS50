@@ -1,19 +1,53 @@
-0.  TODO
-1.  TODO
-2.  TODO
-3.  TODO
-4.  TODO
-5.  TODO
-6.  TODO
-7.  TODO
-8.  TODO
-9.  TODO
-10. TODO
-11. TODO
-12. TODO
-13. TODO
-14. TODO
-15. TODO
-16. TODO
-17. TODO
-18. TODO
+0.  BMP: 32 bit color, or over 4 billion.
+    GIF: 8 bits, 256 colors.
+    JPEG: 24 bit, 16 million.
+    PNG: 24 bit, 16 million.
+
+1.  GIF
+2.  Lossy Compression: is to reduce the size of image with getting rid of the details that the human's eye can't notice.
+                Saving the image over and over can get it worse.
+    Lossless Compression: is to reduce the image size without getting rid of any details of it. It suits text and drawing.
+
+3.  JPEG and GIF.
+
+4.  When the operating system erases a FAT file, two
+things occur. First, the system modifies the filename’s first
+character in the file’s directory entry to signal that the file
+has been deleted and that the directory entry can be recycled.
+Second, the system moves all of the file’s FAT clusters
+to the hard drive’s list of free clusters.
+
+5.  Using secure deletion tools, you could erase files by replacing its zeros and ones on the hard disk with zeros.
+6.  The <stdint.h> header shall declare sets of integer types having specified widths.
+
+7.  What’s the point of using uint8_t, uint32_t, int32_t, and uint16_t in a program?
+        to use integer variables with specific width like uint8_t >> 8 bits of unsigned integer.
+        It also helps to make the program cross platform.
+8.  How many bytes is a BYTE, a DWORD, a LONG, and a WORD, respectively?
+    1, 4, 4, 2
+9.  BM, 0x4d42, 19778
+10. How many bytes is a BYTE, a DWORD, a LONG, and a WORD, respectively?
+
+11. What’s the difference between bfSize and biSize?
+    bfSize: is the size, in bytes, of the whole file and stored in BITMAPFILEHEADER.
+    bisize: is the size, in bytes, of BITMAPINFOHEADER structure.
+
+12. What does it mean if biHeight is negative?
+    Because in screen direction from up to down which is like negative y-axis.
+
+13. What field in BITMAPINFOHEADER specifies the BMP’s color depth (i.e., bits per pixel)?
+    biBitCount.
+
+14. Why is the third argument to fread always 1 in our code?
+    because it determines the number of times to read this block of data.
+
+15. What value does copy.c:70 assign padding if bi.biWidth is 3?
+    2
+
+16. What does fseek do?
+    movies the current indicator by the amount applied to fseek (backward, and forward).
+
+17. What is SEEK_CUR?
+    it means from current position in file.
+18. Whodunit?
+    Mel Gibson (or David J. Malan :D)
