@@ -1,11 +1,43 @@
-0.  TODO
-1.  TODO
-2.  TODO
-3.  TODO
-4.  TODO
-5.  TODO
-6.  TODO
-7.  TODO
-8.  TODO
-9.  TODO
-10. TODO
+0.  What is pneumonoultramicroscopicsilicovolcanoconiosis?
+    It's the longest word exists in the English dictionary.
+
+1.  According to its man page, what does getrusage do?
+    Gets resource usage.
+
+2.  Per that same man page, how many members are in a variable of type struct rusage?
+    16.
+
+3.  Why do you think we pass before and after by reference
+    (instead of by value) to calculate, even though we’re not changing their contents?
+    Because struct rusage is big in size, so passing by value will copy it. Consequently will consume large amount of memory.
+
+4.  Explain as precisely as possible, in a paragraph or more, how main goes about reading words from a file.
+    In other words, convince us that you indeed understand how that function’s for loop works.
+    It begins by reading the first alphabetical character of the file. next, it append that character to the word variable
+    and increase the index by one.
+    If the index became longer than LENGTH (the longest word in dictionary), so it's not acceptable word, so while block
+    run to the first next space.
+    If the letter was digit, while block proceed to the end of the number.
+    If the char is not an alphabetical or numerical, means that we reach a space character, so if the index's a value, then
+    we captured a new word and better check it in our dictionary.
+
+5.  Why do you think we used fgetc to read each word’s characters one at a time rather than use fscanf with a format
+    string like "%s" to read whole words at a time? Put another way, what problems might arise by relying on fscanf alone?
+    because the string doesn't have a pattern of formating, also any word can contain another character that is not an
+    alphabetical letter.
+
+6.  Why do you think we declared the parameters for check and load as const?
+    To guarantee that the functions wouldn't change any of the parameter list.
+
+7.  What data structure(s) did you use to implement your spell-checker?
+    Be sure not to leave your answer at just "hash table," "trie," or the like. Expound on what’s inside each of.
+    Trie wherein each node contains boolean variables to indicate if it a word or not and an array[26] letter (alphabet and
+    apostrophe).
+
+8.  How slow was your code the first time you got it working correctly?
+    first was 0.25 second but after minor tweaks it became 0.21 seconds or less.
+9.  What kinds of changes, if any, did you make to your code in order to improve its performance?
+    instead of calling some functions many times, I stored the return value inside a variable and called the function once.
+
+10. Do you feel that your code has any bottlenecks that you were not able to chip away at?
+    yes, somehow.

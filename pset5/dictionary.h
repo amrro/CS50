@@ -16,6 +16,8 @@
 // (e.g., pneumonoultramicroscopicsilicovolcanoconiosis)
 #define LENGTH 45
 
+#define APOSTROPHE 26
+
 /**
  * Returns true if word is in dictionary else false.
  */

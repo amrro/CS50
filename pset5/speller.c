@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
 
     // prepare to spell-check
     int index = 0, misspellings = 0, words = 0;
-    char word[LENGTH+1];
+    char word[LENGTH + 1];
 
     // spell-check each word in text
     for (int c = fgetc(fp); c != EOF; c = fgetc(fp))
@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
             }
         }
 
-        // ignore words with numbers (like MS Word can)
+            // ignore words with numbers (like MS Word can)
         else if (isdigit(c))
         {
             // consume remainder of alphanumeric string
@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
             index = 0;
         }
 
-        // we must have found a whole word
+            // we must have found a whole word
         else if (index > 0)
         {
             // terminate current word
@@ -175,8 +175,8 @@ int main(int argc, char* argv[])
     printf("TIME IN check:        %.2f\n", time_check);
     printf("TIME IN size:         %.2f\n", time_size);
     printf("TIME IN unload:       %.2f\n", time_unload);
-    printf("TIME IN TOTAL:        %.2f\n\n", 
-     time_load + time_check + time_size + time_unload);
+    printf("TIME IN TOTAL:        %.2f\n\n",
+           time_load + time_check + time_size + time_unload);
 
     // that's all folks
     return 0;
@@ -194,9 +194,9 @@ double calculate(const struct rusage* b, const struct rusage* a)
     else
     {
         return ((((a->ru_utime.tv_sec * 1000000 + a->ru_utime.tv_usec) -
-                 (b->ru_utime.tv_sec * 1000000 + b->ru_utime.tv_usec)) +
-                ((a->ru_stime.tv_sec * 1000000 + a->ru_stime.tv_usec) -
-                 (b->ru_stime.tv_sec * 1000000 + b->ru_stime.tv_usec)))
+                  (b->ru_utime.tv_sec * 1000000 + b->ru_utime.tv_usec)) +
+                 ((a->ru_stime.tv_sec * 1000000 + a->ru_stime.tv_usec) -
+                  (b->ru_stime.tv_sec * 1000000 + b->ru_stime.tv_usec)))
                 / 1000000.0);
     }
 }
