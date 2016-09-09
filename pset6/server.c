@@ -68,10 +68,19 @@ int cfd = -1, sfd = -1;
 
 // flag indicating whether control-c has been heard
 bool signaled = false;
+/*
+// file extensions for lookup
+const int EXTENTIONS_NUM = 8;
+const char* EXTENTIONS[8] = {".css", ".html", ".gif", ".ico", ".jpg", ".js", ".php", ".png"};
+const char* PATHS[8] = {
+        "text/css", "text/html", "image/gif", "image/x-icon",
+        "image/jpeg", "text/javascript", "text/x-php", "image/png"
+};
 
+*/
 int main(int argc, char* argv[])
 {
-    // a global variable defined in errno.h that's "set by system 
+    // a global variable defined in errno.h that's "set by system
     // calls and some library functions [to a nonzero value]
     // in the event of an error to indicate what went wrong"
     errno = 0;
@@ -267,7 +276,7 @@ int main(int argc, char* argv[])
 }
 
 /**
- * Checks (without blocking) whether a client has connected to server. 
+ * Checks (without blocking) whether a client has connected to server.
  * Returns true iff so.
  */
 bool connected(void)
@@ -326,7 +335,7 @@ void freedir(struct dirent** namelist, int n)
         free(namelist);
     }
 }
- 
+
 /**
  * Handles signals.
  */
@@ -445,6 +454,38 @@ char* htmlspecialchars(const char* s)
 char* indexes(const char* path)
 {
     // TODO
+    // ensure path is readable
+    if (access(path, R_OK) == -1)
+    {
+        error(403);
+        return NULL;
+    }
+    // to iterates over files inside the directory
+    struct dirent* ent;
+
+    // the returned value
+    char* index = malloc(strlen(path) + strlen("index.php"));
+
+    // opening directory
+    DIR *dir = opendir(path);
+    if (dir != NULL)
+    {
+        while ((ent = readdir(dir)) != NULL)
+        {
+            if (strcmp(ent->d_name, "index.php") == 0)
+            {
+                sprintf(index, "%s%s", path, "/index.php");
+                return index;
+            }
+            if (strcmp(ent->d_name, "index.html") == 0)
+            {
+                sprintf(index, "%s%s", path, "/index.html");
+                return index;
+            }
+        }
+        closedir(dir);
+    }
+
     return NULL;
 }
 
@@ -609,8 +650,17 @@ void list(const char* path)
  */
 bool load(FILE* file, BYTE** content, size_t* length)
 {
-    // TODO
-    return false;
+    *content = NULL;
+    *length = 0;
+    BYTE buffer[BYTES];
+    size_t read = 0;
+    while ((read = fread(buffer, 1, BYTES, file)))
+    {
+        *length += read;
+        *content = realloc(*content, *length);
+        memcpy(*content + *length - read, &buffer, read);
+    }
+    return true;
 }
 
 /**
@@ -618,20 +668,142 @@ bool load(FILE* file, BYTE** content, size_t* length)
  */
 const char* lookup(const char* path)
 {
-    // TODO
-    return NULL;
+    /*
+    char *copy = strdup(path);
+    strsep(&copy, ".");
+    if (copy == NULL)
+        return NULL;
+
+    for (int i = 0; i < EXTENTIONS_NUM; i++)
+        if (strcmp(EXTENTIONS[i], copy) == 0)
+            return PATHS[i];
+    return "image/jpeg";;
+    */
+
+    if (strcasestr(path, ".css") != NULL)
+    {
+        return "text/css";
+    }
+
+    else if (strcasestr(path, ".html") != NULL)
+    {
+        return "text/html";
+    }
+
+    else if (strcasestr(path, ".gif") != NULL)
+    {
+        return "image/gif";
+    }
+
+    else if (strcasestr(path, ".ico") != NULL)
+    {
+        return "image/x-icon";
+    }
+
+    else if (strcasestr(path, ".jpg") != NULL)
+    {
+        return "image/jpeg";
+    }
+
+    else if (strcasestr(path, ".js") != NULL)
+    {
+        return "text/javascript";
+    }
+
+    else if (strcasestr(path, ".php") != NULL)
+    {
+        return "text/x-php";
+    }
+
+    else if (strcasestr(path, ".png") != NULL)
+    {
+        return "image/png";
+    }
+
+    else
+        return NULL;
 }
 
 /**
- * Parses a request-line, storing its absolute-path at abs_path 
+ * Parses a request-line, storing its absolute-path at abs_path
  * and its query string at query, both of which are assumed
  * to be at least of length LimitRequestLine + 1.
  */
 bool parse(const char* line, char* abs_path, char* query)
 {
-    // TODO
-    error(501);
-    return false;
+    if (line == NULL)
+    {
+        error(400);
+        return false;
+    }
+    // copy the line to another location.
+    char* copy = strdup(line);
+
+    // getting the first token => method.
+    char* method = strsep(&copy, " ");
+    if (method == NULL || method[0] == '\0')
+    {
+        error (400);
+        return false;
+    }
+
+    // if method is not get.
+    if (strcmp(method, "GET"))
+    {
+        error(405);
+        return false;
+    }
+
+    // ensure path starts with /.
+    if (copy[0] != '/')
+    {
+        error(501);
+        return false;
+    }
+
+    // get path.
+    char* path = strsep(&copy, " ");
+
+    // ensure path exists and doesn't contain any quotes.
+    if (path == NULL || path[0] == '\0' || strchr(path, '\"') != NULL)
+    {
+        error(400);
+        return false;
+    }
+
+    char *http = strsep(&copy, "\r\n");
+    if (http == NULL || http[0] == '\0')
+    {
+        error(400);
+        return false;
+    }
+
+    // ensure version is 1.1
+    if (strcmp(http, "HTTP/1.1"))
+    {
+        error(505);
+        return false;
+    }
+
+    char* temp = strsep(&path, "?");
+    if (temp != NULL)
+    {
+        strcpy(abs_path, temp);
+        if (path == NULL)
+        {
+            query[0] = '\0';
+        }
+        else
+        {
+            strcpy(query, path);
+        }
+    }
+
+    // error(501);
+    // free(method);
+    // free(path);
+    // free(http);
+    return true;
 }
 
 /**
@@ -690,7 +862,7 @@ bool request(char** message, size_t* length)
     *message = NULL;
     *length = 0;
 
-    // read message 
+    // read message
     while (*length < LimitRequestLine + LimitRequestFields * LimitRequestFieldSize + 4)
     {
         // read from socket
@@ -707,7 +879,7 @@ bool request(char** message, size_t* length)
             break;
         }
 
-        // append bytes to message 
+        // append bytes to message
         *message = realloc(*message, *length + bytes + 1);
         if (*message == NULL)
         {
@@ -1005,7 +1177,7 @@ char* urldecode(const char* s)
     {
         return NULL;
     }
-    
+
     // iterate over characters in s, decoding percent-encoded octets, per
     // https://www.ietf.org/rfc/rfc3986.txt
     for (int i = 0, j = 0, n = strlen(s); i < n; i++, j++)
