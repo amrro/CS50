@@ -20,7 +20,7 @@
         }
         else if (empty($_POST["password"]))
         {
-            apologize("You must provide your password.");
+            apologize("You must confrim your password.");
         }
 
         // query database for user
