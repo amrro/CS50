@@ -27,13 +27,13 @@ html, body, #map-canvas, .container-fluid
 #form
 {
     /* distance from left edge of viewport */
-    left: 100px;
+    left: 50px;
 
     /* position form "absolutely" where we want it */
     position: absolute;
 
     /* distance from top edge of viewport */
-    top: 28px;
+    top: 20px;
 }
 
 /* stylize text box */

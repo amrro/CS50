@@ -19,7 +19,8 @@ var markers = [];
 var info = new google.maps.InfoWindow();
 
 // execute when the DOM is fully loaded
-$(function() {
+$(function() 
+{
 
     // styles for map
     // https://developers.google.com/maps/documentation/javascript/styling
@@ -48,14 +49,16 @@ $(function() {
     // options for map
     // https://developers.google.com/maps/documentation/javascript/reference#MapOptions
     var options = {
-        center: {lat: 37.4236, lng: -122.1619}, // Stanford, California
+        center: {lat: 42.3770, lng: -71.1256}, // Cambridge 
         disableDefaultUI: true,
         mapTypeId: google.maps.MapTypeId.ROADMAP,
         maxZoom: 14,
         panControl: true,
         styles: styles,
         zoom: 13,
-        zoomControl: true
+        zoomControl: true,
+        fullscreenControl: true,
+        rotateControl: true
     };
 
     // get DOM node in which map will be instantiated
@@ -65,6 +68,7 @@ $(function() {
     map = new google.maps.Map(canvas, options);
 
     // configure UI once Google Map is idle (i.e., loaded)
+    // and calls configure() function:
     google.maps.event.addListenerOnce(map, "idle", configure);
 
 });
@@ -75,6 +79,63 @@ $(function() {
 function addMarker(place)
 {
     // TODO
+    var marker = new MarkerWithLabel({
+        position: new google.maps.LatLng(place.latitude, place.longitude),
+        draggable:false,
+        labelAnchor: new google.maps.Point(22, 0),
+        labelStyle: {opacity: 0.75},
+        labelClass: "label",
+        labelContent: place.place_name + ", " + place.admin_name1, 
+        title:"show news",
+        animation: google.maps.Animation.DROP,
+        icon: 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png'
+    });
+    
+    marker.addListener("click", function()
+    {
+        showInfo(marker);
+        $.getJSON("articles.php", { geo: place.postal_code})
+        .always (function(data)
+        {
+            /*if (parseInt(data.length) > 0)
+            {
+                console.log(data);
+            }*/
+        })
+        .done( function(data) 
+        {
+            if (parseInt(data.length) > 0)
+            {
+                var boot_list = "<div class=\"list-group\">";
+                var item_template = _.template("<a href=\"<%- link %>\" class=\"list-group-item\"><strong>* <%- title %> - <mark><%- provider %></mark></strong></a>");
+                for (let element of data)
+                {
+                    boot_list += item_template({
+                        link : element.link,
+                        title: element.title.split("-")[0],
+                        provider: element.title.split("-")[1]
+                    });
+                }
+                boot_list += "</div>";
+                showInfo(marker, boot_list);
+            }
+            else
+            {
+                showInfo(marker, "No news today!");
+            }
+        })
+        .fail( function(data)
+        {
+            console.log("failed to load data from article.php");
+        })
+        
+    });
+    
+    marker.setMap(map);
+    markers.push(marker);
+
+
+
 }
 
 /**
@@ -108,7 +169,7 @@ function configure()
         source: search,
         templates: {
             empty: "no places found yet",
-            suggestion: _.template("<p>TODO</p>")
+            suggestion: _.template("<p><%- place_name %>, <%- admin_name1 %>, <%- postal_code %></p>")
         }
     });
 
@@ -160,6 +221,11 @@ function hideInfo()
 function removeMarkers()
 {
     // TODO
+    for (let marker of markers)
+    {
+        marker.setMap(null);
+    }
+    marker = [];
 }
 
 /**
